@@ -38,7 +38,7 @@ def main():
                             bot.delete_message(idtg, int(message.message_id)-1,2)
                         except:
                             pass
-                    except:
+                    except: 
                             pass
                     c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
                     if c.fetchone() == 0:
