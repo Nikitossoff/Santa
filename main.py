@@ -40,7 +40,11 @@ def main():
                             pass
                     except:
                             pass
-                    text.hello(bot, message)
+                    c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
+                    if c.fetchone() == None:
+                        text.hello(bot, message)
+                    else:
+                        text.menu(bot, message)
             @bot.message_handler(content_types=['text'])
             def menu(message):
                 idtg = str(message.from_user.id)
@@ -79,39 +83,10 @@ def main():
                 idtg = str(call.message.chat.id)
                 db = sqlite3.connect("santa.db")
                 c = db.cursor()
+                if "Main" in call.data:
+                    text.menu(bot,call=call)
                 if "lavmenu" in call.data:
-                    try: 
-                        bot.delete_message(idtg, call.message.message_id)
-                        try:
-                            bot.delete_message(idtg, int(call.message.message_id)-1,2)
-                        except:
-                            pass
-                    except:
-                        pass
-                    try:
-                        c.execute("""SELECT rowid FROM users ORDER BY rowid DESC LIMIT 1""")
-                        users = c.fetchone()[0]
-                    except:
-                        users = 0
-                    data = (call.data.split("|")[1])
-                    c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
-                    imya = c.fetchone()
-                    c.execute("""SELECT * FROM price ORDER BY RANDOM() LIMIT 1""")
-                    tsena = c.fetchone()
-                    c.execute(f"""UPDATE users SET gift = {imya} WHERE name = ?""",[data[0]])
-                    c.execute(f"""UPDATE users SET price = {tsena}, SET present = {data[0]} WHERE idtg = ?""", [idtg])
-                    db.commit()
-                    markup = types.InlineKeyboardMarkup(row_width = 1)
-                    btn1 = types.InlineKeyboardButton(text="Подробности о человеке", callback_data=f"Podr")
-                    markup.add(btn1)
-                    file = open("img.jpg", "rb")
-                    bot.send_photo(idtg, file, f'''
-    <b>Меню</b>
-    Человек котрому вы дарите - {data[0]}
-    Стоимость - {tsena}
-    Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
-    Всего пользователей - {users}
-                    ''',  reply_markup=markup, parse_mode='HTML')
+                    text.menu2(bot,call=call)
                 if "Dop" in call.data:
                     try: 
                         bot.delete_message(idtg, call.message.message_id)

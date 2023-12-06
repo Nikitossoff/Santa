@@ -81,3 +81,42 @@ def menu(bot, message=None, call=None):
     Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
     Всего пользователей - {users}
                     ''',  reply_markup=markup, parse_mode='HTML')
+def menu2(bot, message=None, call=None):
+    try:
+        idtg = str(message.from_user.id)
+    except:
+        idtg = str(call.message.chat.id)
+    db = sqlite3.connect("santa.db")
+    c  = db.cursor()
+    try: 
+        bot.delete_message(idtg, call.message.message_id)
+        try:
+            bot.delete_message(idtg, int(call.message.message_id)-1,2)
+        except:
+            pass
+    except:
+        pass
+    try:
+        c.execute("""SELECT rowid FROM users ORDER BY rowid DESC LIMIT 1""")
+        users = c.fetchone()[0]
+    except:
+        users = 0
+    data = (call.data.split("|")[1])
+    c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
+    imya = c.fetchone()
+    c.execute("""SELECT * FROM price ORDER BY RANDOM() LIMIT 1""")
+    tsena = c.fetchone()
+    c.execute(f"""UPDATE users SET gift = {imya} WHERE name = ?""",[data[0]])
+    c.execute(f"""UPDATE users SET price = {tsena}, SET present = {data[0]} WHERE idtg = ?""", [idtg])
+    db.commit()
+    markup = types.InlineKeyboardMarkup(row_width = 1)
+    btn1 = types.InlineKeyboardButton(text="Подробности о человеке", callback_data=f"Podr")
+    markup.add(btn1)
+    file = open("img.jpg", "rb")
+    bot.send_photo(idtg, file, f'''
+    <b>Меню</b>
+    Человек котрому вы дарите - {data[0]}
+    Стоимость - {tsena}
+    Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
+    Всего пользователей - {users}
+    ''',  reply_markup=markup, parse_mode='HTML')
