@@ -41,7 +41,7 @@ def main():
                     except:
                             pass
                     c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
-                    if c.fetchone() == None:
+                    if c.fetchone() == 0:
                         text.hello(bot, message)
                     else:
                         text.menu(bot, message)

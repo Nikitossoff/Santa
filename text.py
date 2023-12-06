@@ -64,8 +64,8 @@ def menu(bot, message=None, call=None):
     db = sqlite3.connect("santa.db")
     c  = db.cursor()
     try:
-        c.execute("""SELECT rowid FROM users ORDER BY rowid DESC LIMIT 1""")
-        users = c.fetchone()[0]
+        c.execute("""SELECT * FROM users""")
+        users = len(c.fetchall())
     except:
         users = 0
     file = open("img.jpg", "rb")
@@ -97,8 +97,8 @@ def menu2(bot, message=None, call=None):
     except:
         pass
     try:
-        c.execute("""SELECT rowid FROM users ORDER BY rowid DESC LIMIT 1""")
-        users = c.fetchone()[0]
+        c.execute("""SELECT * FROM users""")
+        users = len(c.fetchall())
     except:
         users = 0
     data = (call.data.split("|")[1])
