@@ -190,7 +190,7 @@ def generation(bot, message=None, call=None):
         c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, data[0]])
         c.execute(f"""UPDATE users SET price = ?, present = ? WHERE idtg = ?""", [tsena, data[0], idtg])
         db.commit()
-        bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJlVWVwiuRPsDWoXc5akbSCgsUKZNJVAAI1EgAChQ6pSYCQPfXpdLT8MwQ')
+        bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
         markup = types.InlineKeyboardMarkup(row_width = 1)
         if pererol == 1:
             btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data="Pere")

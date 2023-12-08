@@ -425,7 +425,7 @@ def main():
                         c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, data[0]])
                         c.execute(f"""UPDATE users SET price = ?, present = ? WHERE idtg = ?""", [tsena, data[0], idtg])
                         db.commit()
-                        bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlVWVwiuRPsDWoXc5akbSCgsUKZNJVAAI1EgAChQ6pSYCQPfXpdLT8MwQ')
+                        bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
                         markup = types.InlineKeyboardMarkup(row_width = 1)
                         if pererol == 1:
                             btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data="Pere")
@@ -585,7 +585,7 @@ def main():
                             db.commit()
                             file = open("img.jpg", "rb")
                             markup = types.InlineKeyboardMarkup(row_width = 1)
-                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"adminm")
+                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"Udal")
                             markup.add(btn4)
                             bot.send_photo(idtg, file, f'''
 Готово!
@@ -652,7 +652,7 @@ def main():
                             db.commit()
                             file = open("img.jpg", "rb")
                             markup = types.InlineKeyboardMarkup(row_width = 1)
-                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"adminm")
+                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"Udal")
                             markup.add(btn4)
                             bot.send_photo(idtg, file, f'''
 Готово!
@@ -719,7 +719,7 @@ def main():
                             db.commit()
                             file = open("img.jpg", "rb")
                             markup = types.InlineKeyboardMarkup(row_width = 1)
-                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"adminm")
+                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"Udal")
                             markup.add(btn4)
                             bot.send_photo(idtg, file, f'''
 Готово!
@@ -786,7 +786,7 @@ def main():
                             db.commit()
                             file = open("img.jpg", "rb")
                             markup = types.InlineKeyboardMarkup(row_width = 1)
-                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"adminm")
+                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"Udal")
                             markup.add(btn4)
                             bot.send_photo(idtg, file, f'''
 Готово!
