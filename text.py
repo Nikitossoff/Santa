@@ -162,12 +162,11 @@ def generation(bot, message=None, call=None):
         bot.send_message(message.chat.id, f"""
 Подготовка к генерации...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-        time.sleep(1)
         while True:
             bot.edit_message_text(chat_id=message.chat.id, message_id=int(message.message_id+2),text=f"""
 Генерируем...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-            i += 20
+            i += 25
             time.sleep(1)
             if i == 100:
                 bot.edit_message_text(chat_id=message.chat.id, message_id=int(message.message_id+2),text=f"""
@@ -179,7 +178,9 @@ def generation(bot, message=None, call=None):
                 except:
                     pass
                 break
-        c.execute("SELECT * FROM users WHERE present = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (idtg,))
+        c.execute("""SELECT present FROM users """)
+        gg = c.fetchall()
+        c.execute("SELECT * FROM users WHERE present <> ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg,gg])
         data = c.fetchone()
         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
         pererol = c.fetchone()[0]

@@ -63,10 +63,11 @@ def main():
                         bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
                         bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
                     else:
-                        if Pe == 0:
-                            text.hello(bot, message)
-                        else:
+                        if Pe != None:
                             text.menu(bot, message)
+                        else:
+                            text.hello(bot, message)
+                            
                     
             @bot.message_handler(content_types=['text'])
             def menu(message):
@@ -297,6 +298,7 @@ def main():
                         gg = c.fetchone()[0]
                         c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [0, gg])
                         c.execute("""UPDATE users SET present = ? WHERE name = ?""", [0, x])
+                        c.execute("""UPDATE users SET pererol = ? WHERE name = ?""", [1, x])
                         db.commit()
                         file = open("img.jpg", "rb")
                         markup = types.InlineKeyboardMarkup(row_width = 1)
@@ -395,12 +397,11 @@ def main():
                         bot.send_message(call.message.chat.id, f"""
 Подготовка к генерации...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                        time.sleep(1)
                         while True:
                             bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
 Генерируем...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                            i += 20
+                            i += 25
                             time.sleep(1)
                             if i == 100:
                                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
@@ -413,7 +414,9 @@ def main():
                                 except:
                                     pass
                                 break
-                        c.execute("SELECT * FROM users WHERE present = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (idtg,))
+                        c.execute("""SELECT present FROM users """)
+                        gg = c.fetchall()[0]
+                        c.execute("SELECT * FROM users WHERE present <> ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (gg, idtg))
                         data = c.fetchone()
                         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
                         pererol = c.fetchone()[0]
@@ -514,7 +517,7 @@ def main():
                         except:
                             pass
                     except:
-                            pass 
+                        pass 
                     text.admin(bot, message=message)
                 else:
                     bot.delete_message(idtg, message.message_id)
@@ -536,6 +539,9 @@ def main():
                             count += 1
                         except:
                             pass
+                    markup = types.InlineKeyboardMarkup(row_width = 1)
+                    btn3 = types.InlineKeyboardButton(text="Сначала👈", callback_data=f"adminm")
+                    markup.add(btn3)
                     bot.send_message(idtg, f'''
 Отправленно - {count}
                     ''', parse_mode='HTML')
