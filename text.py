@@ -46,20 +46,11 @@ def hello(bot, message=None, call=None):
 Она играеться как в небольшой компании до 5 человек, так и в большом дружном классе!
         ''', reply_markup=markup, parse_mode='HTML')
 def admin(bot, message=None, call=None):
-    try:
-        idtg = str(message.from_user.id)
-    except:
-        idtg = str(call.message.chat.id)
-    try:
-        idi = call.message.from_user.id
-    except:
-        idi = message.from_user.id
     db = sqlite3.connect("santa.db")
     c  = db.cursor()
-    idi = message.from_user.id
-    c.execute("""SELECT idtg FROM admins WHERE idtg = ?""", [idi])
+    idtg = (message.from_user.id)
+    c.execute("""SELECT idtg FROM admins WHERE idtg = ?""", [idtg])
     admins = c.fetchone()
-    
     if admins != None:
         try:
             c.execute("""SELECT rowid FROM users ORDER BY rowid DESC LIMIT 1""")
@@ -69,16 +60,17 @@ def admin(bot, message=None, call=None):
         markup = types.InlineKeyboardMarkup(row_width = 1)
         btn1 = types.InlineKeyboardButton(text="Добавить/Удалить пользователя", callback_data=f"Dop")
         btn2 = types.InlineKeyboardButton(text="Изменить данные пользователя", callback_data=f"Udal")
-        btn3 = types.InlineKeyboardButton(text="Вернуться в меню", callback_data=f"Main")
-        markup.add(btn1, btn2, btn3)
+        btn3 = types.InlineKeyboardButton(text="Рассылка", callback_data=f"admsend")
+        btn4 = types.InlineKeyboardButton(text="Вернуться в меню", callback_data=f"Main")
+        markup.add(btn1, btn2, btn3, btn4)
         file = open("img.jpg", "rb")
         bot.send_photo(idtg, file, f'''
-    <b>Admin меню</b>
-    Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
-    Всего пользователей - {users}
-        ''',  reply_markup=markup, parse_mode='HTML')
+<b>Admin меню</b>
+Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
+Всего пользователей - {users}
+                        ''',  reply_markup=markup, parse_mode='HTML')
     else:
-        bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
+        bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
         bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
 def menu(bot, message=None, call=None):
     try:
@@ -187,7 +179,7 @@ def generation(bot, message=None, call=None):
                 except:
                     pass
                 break
-        c.execute("SELECT * FROM users WHERE gift = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (idtg,))
+        c.execute("SELECT * FROM users WHERE present = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (idtg,))
         data = c.fetchone()
         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
         pererol = c.fetchone()[0]
@@ -209,5 +201,62 @@ def generation(bot, message=None, call=None):
     else:
         bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
         bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
-
-    
+def Izmena(bot, message=None, call=None):
+    try:
+        idtg = str(message.from_user.id)
+    except:
+        idtg = str(call.message.chat.id)
+    db = sqlite3.connect("santa.db")
+    c  = db.cursor()
+    try: 
+        bot.delete_message(idtg, call.message.message_id)
+        try:
+            bot.delete_message(idtg, int(call.message.message_id)-1,2)
+        except:
+            pass
+    except:
+        pass
+    x = (call.data.split("|")[1])
+    c.execute("""SELECT * FROM users WHERE name = ?""", [x])
+    users = c.fetchone()
+    file = open("img.jpg", "rb")
+    markup = types.InlineKeyboardMarkup(row_width = 1)
+    btn1 = types.InlineKeyboardButton(text="Изменить Имя", callback_data=f"Izmenitimya|{x}")
+    btn2 = types.InlineKeyboardButton(text="Изменить нелюбимый продукт", callback_data=f"Izmenitproduct|{x}")
+    btn3 = types.InlineKeyboardButton(text="Удалить чел. кот-й. получит подарок", callback_data=f"Izmenitpodarok|{x}")
+    btn4 = types.InlineKeyboardButton(text="Изменить IDTG", callback_data=f"Izmenitidtg|{x}")
+    btn5 = types.InlineKeyboardButton(text="Изменить  Размер", callback_data=f"Izmenitrazmer|{x}")
+    btn6 = types.InlineKeyboardButton(text="Обратно ", callback_data=f"Udal")
+    markup.add(btn1, btn2, btn3,btn4, btn5, btn6)
+    bot.send_photo(idtg, file, f'''
+Имя - {users[0]}
+Нелюбимый продукт - {users[4]}
+Человек котрому подарит подарок - {users[3]}
+Idtg - {users[1]}
+Размер - {users[7]}
+Выберите что хотите измеить:
+    ''',  reply_markup=markup, parse_mode='HTML')
+def Skibidi(bot, message=None, call=None):
+    try:
+        idtg = str(message.from_user.id)
+    except:
+        idtg = str(call.message.chat.id)
+    db = sqlite3.connect("santa.db")
+    c  = db.cursor()
+    try: 
+        bot.delete_message(idtg, call.message.message_id)
+        try:
+            bot.delete_message(idtg, int(call.message.message_id)-1,2)
+        except:
+            pass
+    except:
+        pass
+    file = open("img.jpg", "rb")
+    markup = types.InlineKeyboardMarkup(row_width = 1)
+    btn1 = types.InlineKeyboardButton(text="Добавить пользователя", callback_data=f"QWERT")
+    btn2 = types.InlineKeyboardButton(text="Удалить пользователя", callback_data=f"Roy")
+    btn3 = types.InlineKeyboardButton(text="Вернуться ", callback_data=f"adminm")
+    markup.add(btn1, btn2, btn3)
+    bot.send_photo(idtg, file, f'''
+Выберите действие
+    ''',  reply_markup=markup, parse_mode='HTML')
