@@ -17,6 +17,27 @@ def hello(bot, message=None, call=None):
         idtg = str(message.from_user.id)
     except:
         idtg = str(call.message.chat.id)
+    try:
+        bot.delete_message(idtg, message.message_id)
+        bot.delete_message(idtg, int(message.message_id)-1)
+        try:
+            bot.delete_message(idtg, int(message.message_id)-2)
+            try:
+                bot.delete_message(idtg, int(message.message_id)-3)
+                try:
+                    bot.delete_message(idtg, int(message.message_id)-4)
+                    try:
+                        bot.delete_message(idtg, int(message.message_id)-5)
+                    except:
+                        pass
+                except:
+                    pass
+            except:
+                pass
+        except:
+            pass
+    except:
+        pass
     markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     btn1 = types.KeyboardButton("Выбрать человека!")
     markup.add(btn1)
@@ -27,7 +48,6 @@ def hello(bot, message=None, call=None):
 Добро пожаловать в игру <u>"Тайный санта"</u>!🎅 
 Я бот, который поможет тебе организовать небольшой праздник в предверии Нового Года!🥳 
 Ну что давай расскажу как играть в Тайного Санту...🎁''',reply_markup=markup,parse_mode='HTML')
-        time.sleep(1)
         bot.send_message(idtg, f'''
         "Тайный Санта" - это игра с анонимным дарением порядков, в которой даритель является также и получателям подарка. 
 🎅 > 🎁 > 🎅 > 🎁 > 🎅
@@ -39,7 +59,6 @@ def hello(bot, message=None, call=None):
 Добро пожаловать в игру <u>"Тайный санта"</u>!🎅 
 Я бот, который поможет тебе организовать небольшой праздник в предверии Нового Года!🥳 
 Ну что давай расскажу как играть в Тайного Санту...🎁''',reply_markup=markup,parse_mode='HTML')
-        time.sleep(1)
         bot.send_message(idtg, f'''
         "Тайный Санта" - это игра с анонимным дарением порядков, в которой даритель является также и получателям подарка. 
 🎅 > 🎁 > 🎅 > 🎁 > 🎅
@@ -77,6 +96,27 @@ def menu(bot, message=None, call=None):
         idtg = str(message.from_user.id)
     except:
         idtg = str(call.message.chat.id)
+    try:
+        bot.delete_message(idtg, message.message_id)
+        bot.delete_message(idtg, int(message.message_id)-1)
+        try:
+            bot.delete_message(idtg, int(message.message_id)-2)
+            try:
+                bot.delete_message(idtg, int(message.message_id)-3)
+                try:
+                    bot.delete_message(idtg, int(message.message_id)-4)
+                    try:
+                        bot.delete_message(idtg, int(message.message_id)-5)
+                    except:
+                        pass
+                except:
+                    pass
+            except:
+                pass
+        except:
+            pass
+    except:
+        pass
     db = sqlite3.connect("santa.db")
     c  = db.cursor()
     try:
@@ -93,7 +133,7 @@ def menu(bot, message=None, call=None):
     btn1 = types.InlineKeyboardButton(text="Подробности о человеке", callback_data=f"Podr")
     markup.add(btn1)
     if pererol == 1:
-        btn2 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{data[0]}")
+        btn2 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{data[3]}")
         markup.add(btn2)
     bot.send_photo(idtg, file, f'''
     <b>Меню</b>
@@ -178,8 +218,17 @@ def generation(bot, message=None, call=None):
                 except:
                     pass
                 break
-        c.execute("SELECT  DISTINCT * FROM users WHERE present = ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (0, idtg,))
-        data = c.fetchone()
+        try:
+            c.execute("""SELECT present FROM users WHERE present <> ?""", [0])
+            tes = c.fetchall()
+            c.execute("SELECT DISTINCT name FROM users WHERE present = ? AND idtg <> ? AND name NOT IN ({}) ORDER BY RANDOM()".format(','.join(['?'] * len(tes))), [0, idtg, *tes])
+            data = c.fetchone()
+            print(1, tes)
+        except:
+            c.execute("SELECT * FROM users WHERE present = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg,])
+            data = c.fetchone()
+            print(2)
+        print(data)
         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
         pererol = c.fetchone()[0]
         c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])

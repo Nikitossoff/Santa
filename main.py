@@ -73,7 +73,23 @@ def main():
                 db = sqlite3.connect("santa.db")
                 c  = db.cursor()
                 if message.text == "Выбрать человека!":
-                    text.generation(bot, message=message)
+                    c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
+                    try:
+                        Pe = c.fetchone()[0]
+                    except:
+                        Pe = 999
+                    if Pe == 999:
+                        bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
+                        bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
+                    else:
+                        if Pe != 0:
+                            markup = types.InlineKeyboardMarkup(row_width = 1)
+                            btn4 = types.InlineKeyboardButton(text="В меню👈", callback_data=f"Main")
+                            markup.add(btn4)
+                            bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
+                            bot.send_message(idtg, f'''Вы уже сгенирировали пользователя!''', reply_markup=markup,  parse_mode='HTML')
+                        else:
+                            text.generation(bot, message=message)
             @bot.callback_query_handler(func=lambda call: True)
             def call_menu(call):
                 idtg = (call.message.chat.id)
@@ -193,7 +209,10 @@ def main():
                     c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
                     gift = c.fetchone()[0]
                     c.execute("""SELECT noise FROM users WHERE name = ?""", [gift])
-                    data = c.fetchone()[0]
+                    try:
+                        data = c.fetchone()[0]
+                    except:
+                        data = "Нету данных"
                     c.execute("""SELECT cap FROM users WHERE name = ?""", [gift])
                     cap = c.fetchone()[0]
                     file = open("img.jpg", "rb")
@@ -369,10 +388,10 @@ def main():
                         i = 0
                         a = types.ReplyKeyboardRemove()
                         x = (call.data.split("|")[1])
-                        c.execute("""SELECT present FROM users WHERE name = ?""",[x])
+                        c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
                         gg = c.fetchone()[0]
-                        c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [0, gg])
-                        c.execute("""UPDATE users SET present = ? WHERE name = ?""", [0, x])
+                        c.execute("""UPDATE users SET gift = ? WHERE name = ?""", (0, gg,))
+                        c.execute("""UPDATE users SET present = ? WHERE name = ?""", (0, x,))
                         db.commit()
                         bot.send_message(call.message.chat.id, f"""
 Обработка...""", parse_mode='HTML', reply_markup=a)
@@ -418,8 +437,16 @@ def main():
                                 except:
                                     pass
                                 break
-                        c.execute("SELECT DISTINCT * FROM users WHERE present = ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (0, idtg,))
-                        data = c.fetchone()
+                        try:
+                            c.execute("""SELECT present FROM users WHERE present <> ?""", [0])
+                            tes = c.fetchall()
+                            c.execute("SELECT DISTINCT name FROM users WHERE present = ? AND idtg <> ? AND name NOT IN ({}) ORDER BY RANDOM()".format(','.join(['?'] * len(tes))), [0, idtg, *tes])
+                            data = c.fetchone()
+                            print(1, tes)
+                        except:
+                            c.execute("SELECT * FROM users WHERE present = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg,])
+                            data = c.fetchone()
+                            print(2)
                         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
                         pererol = c.fetchone()[0]
                         c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
