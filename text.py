@@ -93,7 +93,7 @@ def menu(bot, message=None, call=None):
     btn1 = types.InlineKeyboardButton(text="Подробности о человеке", callback_data=f"Podr")
     markup.add(btn1)
     if pererol == 1:
-        btn2 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data="Pere")
+        btn2 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{data[0]}")
         markup.add(btn2)
     bot.send_photo(idtg, file, f'''
     <b>Меню</b>
@@ -166,7 +166,7 @@ def generation(bot, message=None, call=None):
             bot.edit_message_text(chat_id=message.chat.id, message_id=int(message.message_id+2),text=f"""
 Генерируем...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-            i += 25
+            i += 50
             time.sleep(1)
             if i == 100:
                 bot.edit_message_text(chat_id=message.chat.id, message_id=int(message.message_id+2),text=f"""
@@ -178,9 +178,7 @@ def generation(bot, message=None, call=None):
                 except:
                     pass
                 break
-        c.execute("""SELECT present FROM users """)
-        gg = c.fetchall()
-        c.execute("SELECT * FROM users WHERE present <> ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg,gg])
+        c.execute("SELECT  DISTINCT * FROM users WHERE present = ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (0, idtg,))
         data = c.fetchone()
         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
         pererol = c.fetchone()[0]
@@ -194,7 +192,7 @@ def generation(bot, message=None, call=None):
         bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
         markup = types.InlineKeyboardMarkup(row_width = 1)
         if pererol == 1:
-            btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data="Pere")
+            btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{data[0]}")
             markup.add(btn1)
         btn2 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{data[0]}")
         markup.add(btn2)

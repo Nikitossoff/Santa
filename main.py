@@ -63,12 +63,10 @@ def main():
                         bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
                         bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
                     else:
-                        if Pe != None:
+                        if Pe != 0:
                             text.menu(bot, message)
                         else:
                             text.hello(bot, message)
-                            
-                    
             @bot.message_handler(content_types=['text'])
             def menu(message):
                 idtg = str(message.from_user.id)
@@ -370,6 +368,12 @@ def main():
                     if users != None:
                         i = 0
                         a = types.ReplyKeyboardRemove()
+                        x = (call.data.split("|")[1])
+                        c.execute("""SELECT present FROM users WHERE name = ?""",[x])
+                        gg = c.fetchone()[0]
+                        c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [0, gg])
+                        c.execute("""UPDATE users SET present = ? WHERE name = ?""", [0, x])
+                        db.commit()
                         bot.send_message(call.message.chat.id, f"""
 Обработка...""", parse_mode='HTML', reply_markup=a)
                         try:
@@ -401,7 +405,7 @@ def main():
                             bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
 Генерируем...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                            i += 25
+                            i += 50
                             time.sleep(1)
                             if i == 100:
                                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
@@ -414,9 +418,7 @@ def main():
                                 except:
                                     pass
                                 break
-                        c.execute("""SELECT present FROM users """)
-                        gg = c.fetchall()[0]
-                        c.execute("SELECT * FROM users WHERE present <> ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (gg, idtg))
+                        c.execute("SELECT DISTINCT * FROM users WHERE present = ? AND idtg <> ? ORDER BY RANDOM() LIMIT 1", (0, idtg,))
                         data = c.fetchone()
                         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
                         pererol = c.fetchone()[0]
@@ -431,7 +433,7 @@ def main():
                         bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
                         markup = types.InlineKeyboardMarkup(row_width = 1)
                         if pererol == 1:
-                            btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data="Pere")
+                            btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{data[0]}")
                             markup.add(btn1)
                         markup = types.InlineKeyboardMarkup(row_width = 1)
                         btn1 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{data[0]}")
