@@ -215,7 +215,7 @@ def main():
                         data = "Нету данных"
                     c.execute("""SELECT cap FROM users WHERE name = ?""", [gift])
                     cap = c.fetchone()[0]
-                    file = open("img.jpg", "rb")
+                    file = open("Ojel.png", "rb")
                     markup = types.InlineKeyboardMarkup(row_width = 1)
                     btn1 = types.InlineKeyboardButton(text="Обратно в меню", callback_data=f"Main")
                     markup.add(btn1)
@@ -391,8 +391,6 @@ def main():
                         c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
                         gg = c.fetchone()[0]
                         c.execute("""UPDATE users SET gift = ? WHERE name = ?""", (0, gg,))
-                        c.execute("""UPDATE users SET present = ? WHERE name = ?""", (0, x,))
-                        db.commit()
                         bot.send_message(call.message.chat.id, f"""
 Обработка...""", parse_mode='HTML', reply_markup=a)
                         try:
@@ -420,33 +418,41 @@ def main():
                         bot.send_message(call.message.chat.id, f"""
 Подготовка к генерации...
 <b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                        while True:
-                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
-Генерируем...
-<b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                            i += 50
-                            time.sleep(1)
-                            if i == 100:
+                        try:
+                            while True:
                                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
 Генерируем...
-<b>Процент выполнения - 100%</b>""", parse_mode='HTML')
+<b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
+                                i += 50
                                 time.sleep(1)
-                                try:
-                                    bot.delete_message(idtg, int(call.message.message_id+2))
-                                    bot.delete_message(idtg, int(call.message.message_id)+1)
-                                except:
-                                    pass
-                                break
-                        try:
-                            c.execute("""SELECT present FROM users WHERE present <> ?""", [0])
-                            tes = c.fetchall()
-                            c.execute("SELECT DISTINCT name FROM users WHERE present = ? AND idtg <> ? AND name NOT IN ({}) ORDER BY RANDOM()".format(','.join(['?'] * len(tes))), [0, idtg, *tes])
-                            data = c.fetchone()
-                            print(1, tes)
+                                if i == 100:
+                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
+Генерируем...
+<b>Процент выполнения - 100%</b>""", parse_mode='HTML')
+                                    time.sleep(1)
+                                    try:
+                                        bot.delete_message(idtg, int(call.message.message_id+2))
+                                        bot.delete_message(idtg, int(call.message.message_id)+1)
+                                    except:
+                                        pass
+                                    break
                         except:
-                            c.execute("SELECT * FROM users WHERE present = 0 AND idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg,])
-                            data = c.fetchone()
-                            print(2)
+                            markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+                            btn1 = types.KeyboardButton("Выбрать человека!")
+                            markup.add(btn1)
+                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
+                            bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз!''', reply_markup=markup, parse_mode='HTML')
+                    
+                        c.execute("""SELECT * FROM users WHERE present <> ?""", [0])
+                        data1 = c.fetchall()  # Используйте fetchall() вместо fetchone()
+                        placeholders = ', '.join('?' * len(data1))
+                        query = f"""SELECT name FROM users WHERE present = 0 AND idtg <> ? AND name NOT IN ({placeholders}) ORDER BY RANDOM() LIMIT 1"""
+                        params = [idtg]
+                        params.extend([item[3] for item in data1])  # Используйте генератор списка для получения всех значений из data1
+                        c.execute(query, params)
+                        data = c.fetchone()
+                        c.execute("""UPDATE users SET present = ? WHERE name = ?""", (0, x,))
+                        db.commit()
                         c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
                         pererol = c.fetchone()[0]
                         c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
@@ -465,7 +471,8 @@ def main():
                         markup = types.InlineKeyboardMarkup(row_width = 1)
                         btn1 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{data[0]}")
                         markup.add(btn1)
-                        bot.send_message(idtg, f'''Готово! Бот вам выбрал человека - {data[0]} ''', reply_markup=markup, parse_mode='HTML')
+                        file = open("Gen.png", "rb")
+                        bot.send_photo(idtg, file, f'''Готово! Бот вам выбрал человека - {data[0]} ''', reply_markup=markup, parse_mode='HTML')
                     else:
                         bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
                         bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
@@ -573,7 +580,7 @@ def main():
                     markup.add(btn3)
                     bot.send_message(idtg, f'''
 Отправленно - {count}
-                    ''', parse_mode='HTML')
+                    ''', reply_markup=markup, parse_mode='HTML')
             def Master(message, x):
                 idtg = str(message.chat.id)
                 db = sqlite3.connect("santa.db")
