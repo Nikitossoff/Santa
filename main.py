@@ -391,6 +391,7 @@ def main():
                         c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
                         gg = c.fetchone()[0]
                         c.execute("""UPDATE users SET gift = ? WHERE name = ?""", (0, gg,))
+                        db.commit()
                         bot.send_message(call.message.chat.id, f"""
 Обработка...""", parse_mode='HTML', reply_markup=a)
                         try:
@@ -442,37 +443,47 @@ def main():
                             markup.add(btn1)
                             bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
                             bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз!''', reply_markup=markup, parse_mode='HTML')
-                    
                         c.execute("""SELECT * FROM users WHERE present <> ?""", [0])
-                        data1 = c.fetchall()  # Используйте fetchall() вместо fetchone()
-                        placeholders = ', '.join('?' * len(data1))
-                        query = f"""SELECT name FROM users WHERE present = 0 AND idtg <> ? AND name NOT IN ({placeholders}) ORDER BY RANDOM() LIMIT 1"""
-                        params = [idtg]
-                        params.extend([item[3] for item in data1])  # Используйте генератор списка для получения всех значений из data1
-                        c.execute(query, params)
-                        data = c.fetchone()
-                        c.execute("""UPDATE users SET present = ? WHERE name = ?""", (0, x,))
-                        db.commit()
-                        c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
-                        pererol = c.fetchone()[0]
-                        c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
-                        imya = c.fetchone()[0]
-                        c.execute("""SELECT * FROM price ORDER BY RANDOM() LIMIT 1""")
-                        tsena = c.fetchone()[0]
-                        c.execute("""UPDATE users SET pererol = ? WHERE idtg = ?""", [0, idtg])
-                        c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, data[0]])
-                        c.execute(f"""UPDATE users SET price = ?, present = ? WHERE idtg = ?""", [tsena, data[0], idtg])
-                        db.commit()
-                        bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
-                        markup = types.InlineKeyboardMarkup(row_width = 1)
-                        if pererol == 1:
-                            btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{data[0]}")
+                        data1 = c.fetchall()
+                        names_in_data1 = [row[0] for row in data1]
+                        print(names_in_data1)
+                        random_name = None
+
+                        # Генерация случайного имени
+                        while True:
+                            # Выполнение запроса для выбора случайного имени
+                            c.execute("SELECT name FROM users WHERE idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg])
+                            result = c.fetchone()
+
+                            if result not in names_in_data1:
+                                random_name = result 
+                                break
+
+                        if random_name:
+                            c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
+                            pererol = c.fetchone()[0]
+                            c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
+                            imya = c.fetchone()[0]
+                            c.execute("""SELECT * FROM price ORDER BY RANDOM() LIMIT 1""")
+                            tsena = c.fetchone()[0]
+                            c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, random_name[0]])
+                            c.execute(f"""UPDATE users SET price = ?, present = ? WHERE idtg = ?""", [tsena, random_name[0], idtg])
+                            db.commit()
+                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
+                            markup = types.InlineKeyboardMarkup(row_width = 1)
+                            if pererol == 1:
+                                btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{random_name[0]}")
+                                markup.add(btn1)
+                            btn2 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{random_name[0]}")
+                            markup.add(btn2)
+                            file = open("Gen.png", "rb")
+                            bot.send_photo(idtg, file, f'''Готово! Бот вам выбрал человека - {random_name[0]} ''', reply_markup=markup, parse_mode='HTML')
+                        else:
+                            markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+                            btn1 = types.KeyboardButton("Выбрать человека!")
                             markup.add(btn1)
-                        markup = types.InlineKeyboardMarkup(row_width = 1)
-                        btn1 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{data[0]}")
-                        markup.add(btn1)
-                        file = open("Gen.png", "rb")
-                        bot.send_photo(idtg, file, f'''Готово! Бот вам выбрал человека - {data[0]} ''', reply_markup=markup, parse_mode='HTML')
+                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
+                            bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз!''', reply_markup=markup, parse_mode='HTML')
                     else:
                         bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
                         bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
