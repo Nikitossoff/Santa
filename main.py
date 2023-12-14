@@ -13,6 +13,7 @@ import requests
 import text
 from datetime import  datetime
 import re
+import numpy as np
 def main():
     while True:
         if True:
@@ -361,39 +362,9 @@ def main():
                     ''',  parse_mode='HTML')
                     bot.register_next_step_handler(call.message, Porn, x)
                 if "Pere" in call.data:
-                    try:
-                        bot.delete_message(idtg, call.message.message_id)
-                        bot.delete_message(idtg, int(call.message.message_id)-1)
-                        try:
-                            bot.delete_message(idtg, int(call.message.message_id)-2)
-                            try:
-                                bot.delete_message(idtg, int(call.message.message_id)-3)
-                                try:
-                                    bot.delete_message(idtg, int(call.message.message_id)-4)
-                                    try:
-                                        bot.delete_message(idtg, int(call.message.message_id)-5)
-                                    except:
-                                        pass
-                                except:
-                                    pass
-                            except:
-                                pass
-                        except:
-                            pass
-                    except:
-                        pass
-                    c.execute("""SELECT idtg FROM users WHERE idtg = ?""", [idtg])
-                    users = c.fetchone()
-                    if users != None:
-                        i = 0
-                        a = types.ReplyKeyboardRemove()
-                        x = (call.data.split("|")[1])
-                        c.execute("""SELECT present FROM users WHERE idtg = ?""", [idtg])
-                        gg = c.fetchone()[0]
-                        c.execute("""UPDATE users SET gift = ? WHERE name = ?""", (0, gg,))
-                        db.commit()
-                        bot.send_message(call.message.chat.id, f"""
-Обработка...""", parse_mode='HTML', reply_markup=a)
+                    c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
+                    pererol = c.fetchone()[0]
+                    if pererol == 1:
                         try:
                             bot.delete_message(idtg, call.message.message_id)
                             bot.delete_message(idtg, int(call.message.message_id)-1)
@@ -415,78 +386,116 @@ def main():
                                 pass
                         except:
                             pass
-                        time.sleep(1)
-                        bot.send_message(call.message.chat.id, f"""
-Подготовка к генерации...
-<b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                        try:
-                            while True:
-                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
-Генерируем...
-<b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
-                                i += 50
-                                time.sleep(1)
-                                if i == 100:
-                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
-Генерируем...
-<b>Процент выполнения - 100%</b>""", parse_mode='HTML')
-                                    time.sleep(1)
+                        c.execute("""SELECT idtg FROM users WHERE idtg = ?""", [idtg])
+                        users = c.fetchone()
+                        if users != None:
+                            i = 0
+                            a = types.ReplyKeyboardRemove()
+                            x = (call.data.split("|")[1])
+                            c.execute("""UPDATE users SET pererol = ? WHERE idtg = ?""", [0, idtg])
+                            c.execute("""UPDATE users SET gift = ? WHERE name = ?""", (0, x,))
+                            c.execute("""UPDATE users SET present = ? WHERE idtg = ?""", [0, idtg])
+                            db.commit()
+                            bot.send_message(call.message.chat.id, f"""
+Обработка...""", parse_mode='HTML', reply_markup=a)
+                            try:
+                                bot.delete_message(idtg, call.message.message_id)
+                                bot.delete_message(idtg, int(call.message.message_id)-1)
+                                try:
+                                    bot.delete_message(idtg, int(call.message.message_id)-2)
                                     try:
-                                        bot.delete_message(idtg, int(call.message.message_id+2))
-                                        bot.delete_message(idtg, int(call.message.message_id)+1)
+                                        bot.delete_message(idtg, int(call.message.message_id)-3)
+                                        try:
+                                            bot.delete_message(idtg, int(call.message.message_id)-4)
+                                            try:
+                                                bot.delete_message(idtg, int(call.message.message_id)-5)
+                                            except:
+                                                pass
+                                        except:
+                                            pass
                                     except:
                                         pass
-                                    break
-                        except:
-                            markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-                            btn1 = types.KeyboardButton("Выбрать человека!")
-                            markup.add(btn1)
-                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
-                            bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз!''', reply_markup=markup, parse_mode='HTML')
-                        c.execute("""SELECT * FROM users WHERE present <> ?""", [0])
-                        data1 = c.fetchall()
-                        names_in_data1 = [row[0] for row in data1]
-                        print(names_in_data1)
-                        random_name = None
-
-                        # Генерация случайного имени
-                        while True:
-                            # Выполнение запроса для выбора случайного имени
-                            c.execute("SELECT name FROM users WHERE idtg <> ? ORDER BY RANDOM() LIMIT 1", [idtg])
-                            result = c.fetchone()
-
-                            if result not in names_in_data1:
-                                random_name = result 
-                                break
-
-                        if random_name:
-                            c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
-                            pererol = c.fetchone()[0]
-                            c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
-                            imya = c.fetchone()[0]
-                            c.execute("""SELECT * FROM price ORDER BY RANDOM() LIMIT 1""")
-                            tsena = c.fetchone()[0]
-                            c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, random_name[0]])
-                            c.execute(f"""UPDATE users SET price = ?, present = ? WHERE idtg = ?""", [tsena, random_name[0], idtg])
-                            db.commit()
-                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
-                            markup = types.InlineKeyboardMarkup(row_width = 1)
-                            if pererol == 1:
-                                btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{random_name[0]}")
+                                except:
+                                    pass
+                            except:
+                                pass
+                            time.sleep(1)
+                            bot.send_message(call.message.chat.id, f"""
+Подготовка к генерации...
+<b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
+                            try:
+                                while True:
+                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
+Генерируем...
+<b>Процент выполнения - {i}%</b>""", parse_mode='HTML')
+                                    i += 50
+                                    time.sleep(1)
+                                    if i == 100:
+                                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=int(call.message.message_id+2),text=f"""
+Генерируем...
+<b>Процент выполнения - 100%</b>""", parse_mode='HTML')
+                                        time.sleep(1)
+                                        try:
+                                            bot.delete_message(idtg, int(call.message.message_id+2))
+                                            bot.delete_message(idtg, int(call.message.message_id)+1)
+                                        except:
+                                            pass
+                                        break
+                            except:
+                                markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+                                btn1 = types.KeyboardButton("Выбрать человека!")
                                 markup.add(btn1)
-                            btn2 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{random_name[0]}")
-                            markup.add(btn2)
-                            file = open("Gen.png", "rb")
-                            bot.send_photo(idtg, file, f'''Готово! Бот вам выбрал человека - {random_name[0]} ''', reply_markup=markup, parse_mode='HTML')
+                                bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
+                                bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз!''', reply_markup=markup, parse_mode='HTML')
+                            c.execute("""SELECT present FROM users WHERE present <> ? AND idtg <> ?""", [0, idtg])
+                            data1 = c.fetchall()
+                            names_in_data1 = [row[0] for row in data1]  
+                            c.execute("SELECT name FROM users WHERE idtg <> ?", [idtg])
+                            data2 = c.fetchall()
+                            names_in_data2 = [row[0] for row in data2] 
+                            names_array1 = np.array(names_in_data1)
+                            names_array2 = np.array(names_in_data2)
+                            print(names_array1,names_array2)
+
+                            # Найти имена, которые есть в names_array2, но отсутствуют в names_array1
+                            remaining_names = np.setdiff1d(names_array2, names_array1)
+                            print(remaining_names)
+                            if len(remaining_names) > 0:
+                                # Выбрать случайное имя из remaining_names
+                                random_name = np.random.choice(remaining_names)
+                                c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
+                                pererol = c.fetchone()[0]
+                                c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
+                                imya = c.fetchone()[0]
+                                c.execute("""SELECT * FROM price ORDER BY RANDOM() LIMIT 1""")
+                                tsena = c.fetchone()[0]
+                                c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, random_name])
+                                c.execute(f"""UPDATE users SET price = ?, present = ? WHERE idtg = ?""", [tsena, random_name, idtg])
+                                db.commit()
+                                bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJlqWVzUNOgORUZqe9U3eOwRSSr2cftAAJoEwACvb6wSQLnwBPY3i1VMwQ')
+                                markup = types.InlineKeyboardMarkup(row_width = 1)
+                                if pererol == 1:
+                                    btn1 = types.InlineKeyboardButton(text="Переролл(только один раз)", callback_data=f"Pere|{random_name}")
+                                    markup.add(btn1)
+                                btn2 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main|{random_name}")
+                                markup.add(btn2)
+                                file = open("Gen.png", "rb")
+                                bot.send_photo(idtg, file, f'''Готово! Бот вам выбрал человека - {random_name} ''', reply_markup=markup, parse_mode='HTML')
+                            else:
+                                markup = types.InlineKeyboardMarkup(row_width = 1)
+                                btn2 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main")
+                                markup.add(btn2)
+                                bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
+                                bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз! Возможно нет возможных имен!''', reply_markup=markup, parse_mode='HTML')
                         else:
-                            markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-                            btn1 = types.KeyboardButton("Выбрать человека!")
-                            markup.add(btn1)
-                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJnEWV4Z_Tom3feLp1Id_yCaiPTxwIpAAKREgACEFGoSX_KPekwYirmMwQ')
-                            bot.send_message(idtg, f'''Произошла ошибка, попробуйте еще раз!''', reply_markup=markup, parse_mode='HTML')
+                            bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
+                            bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
                     else:
+                        markup = types.InlineKeyboardMarkup(row_width = 1)
+                        btn2 = types.InlineKeyboardButton(text="Перейти в меню", callback_data=f"Main")
+                        markup.add(btn2)
                         bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
-                        bot.send_message(idtg, f'''У вас нет доступа''',  parse_mode='HTML')
+                        bot.send_message(idtg, f'''Вы уже генирировали человека, перейдите в меню!''', reply_markup=markup, parse_mode='HTML')
             def Noviy(message):
                 idtg = str(message.chat.id)
                 db = sqlite3.connect("santa.db")
