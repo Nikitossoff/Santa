@@ -77,17 +77,24 @@ def admin(bot, message=None, call=None):
             users = c.fetchone()[0]
         except:
             users = 0
+        try:
+           c.execute("""SELECT present FROM users WHERE present = 0""")
+           loxi = len(c.fetchall())
+        except:
+           loxi = 0
         markup = types.InlineKeyboardMarkup(row_width = 1)
         btn1 = types.InlineKeyboardButton(text="Добавить/Удалить пользователя", callback_data=f"Dop")
         btn2 = types.InlineKeyboardButton(text="Изменить данные пользователя", callback_data=f"Udal")
         btn3 = types.InlineKeyboardButton(text="Рассылка", callback_data=f"admsend")
-        btn4 = types.InlineKeyboardButton(text="Вернуться в меню", callback_data=f"Main")
-        markup.add(btn1, btn2, btn3, btn4)
+        btn4 = types.InlineKeyboardButton(text="База данных", callback_data=f"admindb")
+        btn5 = types.InlineKeyboardButton(text="Вернуться в меню", callback_data=f"Main")
+        markup.add(btn1, btn2, btn3, btn4, btn5)
         file = open("img.jpg", "rb")
         bot.send_photo(idtg, file, f'''
 <b>Admin меню</b>
 Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
 Всего пользователей - {users}
+Пользователей не сделавших прокрут - {loxi}
                         ''',  reply_markup=markup, parse_mode='HTML')
     else:
         bot.send_sticker(call.message.chat.id, 'CAACAgIAAxkBAAJeRmVd2w70HltyLA65Ck4yDt8UPj1aAALzAAP3AsgPhnmk5pbwEy4zBA')
@@ -125,6 +132,11 @@ def menu(bot, message=None, call=None):
         users = len(c.fetchall())
     except:
         users = 0
+    try:
+        c.execute("""SELECT present FROM users WHERE present = 0""")
+        loxi = len(c.fetchall())
+    except:
+        loxi = 0
     file = open("menu.jpg", "rb")
     c.execute("""SELECT * FROM users WHERE idtg = ?""", [idtg])
     data = c.fetchone()
@@ -142,6 +154,7 @@ def menu(bot, message=None, call=None):
 Стоимость - {data[2]} (можно и больше)
 Нагрузка сервера - {psutil.cpu_percent(interval=0.1)}%
 Всего пользователей - {users}
+Пользователей не сделавших прокрут - {loxi}
                     ''',  reply_markup=markup, parse_mode='HTML')
 def generation(bot, message=None, call=None):
     try:
@@ -234,10 +247,7 @@ def generation(bot, message=None, call=None):
         names_in_data2 = [row[0] for row in data2] 
         names_array1 = np.array(names_in_data1)
         names_array2 = np.array(names_in_data2)
-        print(names_array1,
-        names_array2)
         remaining_names = np.setdiff1d(names_array2, names_array1)
-        print(remaining_names)
         if len(remaining_names) > 0:
             # Выбрать случайное имя из remaining_names
 
@@ -294,8 +304,9 @@ def Izmena(bot, message=None, call=None):
     btn3 = types.InlineKeyboardButton(text="Удалить чел. кот-й. получит подарок", callback_data=f"Izmenitpodarok|{x}")
     btn4 = types.InlineKeyboardButton(text="Изменить IDTG", callback_data=f"Izmenitidtg|{x}")
     btn5 = types.InlineKeyboardButton(text="Изменить  Размер", callback_data=f"Izmenitrazmer|{x}")
-    btn6 = types.InlineKeyboardButton(text="Обратно ", callback_data=f"Udal")
-    markup.add(btn1, btn2, btn3,btn4, btn5, btn6)
+    btn6 = types.InlineKeyboardButton(text="Изменить  present", callback_data=f"Izmenitpresent|{x}")
+    btn7 = types.InlineKeyboardButton(text="Обратно ", callback_data=f"Udal")
+    markup.add(btn1, btn2, btn3,btn4, btn5, btn6, btn7)
     bot.send_photo(idtg, file, f'''
 Имя - {users[0]}
 Нелюбимый продукт - {users[4]}

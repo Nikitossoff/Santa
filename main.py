@@ -273,6 +273,21 @@ def main():
                     ''',  reply_markup=markup, parse_mode='HTML')
                 if "Chert" in call.data:
                     text.Izmena(bot,call=call)
+                    
+                if "Izmenitpresent" in call.data:
+                    try: 
+                        bot.delete_message(idtg, call.message.message_id)
+                        try:
+                            bot.delete_message(idtg, int(call.message.message_id)-1,2)
+                        except:
+                            pass
+                    except:
+                        pass
+                    x = (call.data.split("|")[1])
+                    bot.send_message(idtg, f'''
+Введите имя в виде: Имя Фамилия или CANCEL для отмены
+                    ''',  parse_mode='HTML')
+                    bot.register_next_step_handler(call.message, Dangeonmaster, x)
                 if "Izmenitimya" in call.data:
                     try: 
                         bot.delete_message(idtg, call.message.message_id)
@@ -361,6 +376,9 @@ def main():
 Введите размер или CANCEL для отмены
                     ''',  parse_mode='HTML')
                     bot.register_next_step_handler(call.message, Porn, x)
+                if "admindb" in call.data:
+                    file = open("santa.db", "rb")
+                    bot.send_document(call.message.chat.id, file)
                 if "Pere" in call.data:
                     c.execute("""SELECT pererol FROM users WHERE idtg = ?""", [idtg])
                     pererol = c.fetchone()[0]
@@ -455,11 +473,11 @@ def main():
                             names_in_data2 = [row[0] for row in data2] 
                             names_array1 = np.array(names_in_data1)
                             names_array2 = np.array(names_in_data2)
-                            print(names_array1,names_array2)
+                    
 
                             # Найти имена, которые есть в names_array2, но отсутствуют в names_array1
                             remaining_names = np.setdiff1d(names_array2, names_array1)
-                            print(remaining_names)
+
                             if len(remaining_names) > 0:
                                 # Выбрать случайное имя из remaining_names
                                 random_name = np.random.choice(remaining_names)
@@ -601,6 +619,74 @@ def main():
                     bot.send_message(idtg, f'''
 Отправленно - {count}
                     ''', reply_markup=markup, parse_mode='HTML')
+                    
+            def Dangeonmaster(message, x):
+                idtg = str(message.chat.id)
+                db = sqlite3.connect("santa.db")
+                c = db.cursor()
+                if message.text == "СANCEL":
+                    try:
+                        bot.delete_message(idtg, message.message_id)
+                        try:
+                            bot.delete_message(idtg, int(message.message_id)-1,2)
+                        except:
+                            pass
+                    except:
+                            pass 
+                    text.admin(bot, message=message)
+                else:
+                    pattern = r".+ .+$"
+                    if not re.match(pattern, message.text):
+                        try:
+                            bot.delete_message(idtg, message.message_id)
+                            try:
+                                bot.delete_message(idtg, int(message.message_id)-1,2)
+                            except:
+                                pass
+                        except:
+                            pass 
+                        markup = types.InlineKeyboardMarkup(row_width = 1)
+                        btn3 = types.InlineKeyboardButton(text="Сначала👈", callback_data=f"Udal")
+                        markup.add(btn3)
+                        bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAJeSmVd3D6b87zzI1ex_FcFGA1_m9LOAALbBQACP5XMCjz4rPnlRa-CMwQ')
+                        bot.send_message(message.chat.id, f'''
+<u><b>Вы написали неправильный текст, попробуйте еще раз</b></u>                                                                           
+                        ''', reply_markup=markup, parse_mode='HTML') 
+                    else:
+                        try:
+                            try:
+                                bot.delete_message(idtg, message.message_id)
+                                try:
+                                    bot.delete_message(idtg, int(message.message_id)-1,2)
+                                except:
+                                    pass
+                            except:
+                                pass 
+                            c.execute("""UPDATE users SET present = ? WHERE name = ?""", [message.text, x])
+                            db.commit()
+                            file = open("img.jpg", "rb")
+                            markup = types.InlineKeyboardMarkup(row_width = 1)
+                            btn4 = types.InlineKeyboardButton(text="Обратно", callback_data=f"Udal")
+                            markup.add(btn4)
+                            bot.send_photo(idtg, file, f'''
+Готово!
+                            ''',  reply_markup=markup, parse_mode='HTML')
+                        except:
+                            try:
+                                bot.delete_message(idtg, message.message_id)
+                                try:
+                                    bot.delete_message(idtg, int(message.message_id)-1,2)
+                                except:
+                                    pass
+                            except:
+                                pass 
+                            file = open("img.jpg", "rb")
+                            markup = types.InlineKeyboardMarkup(row_width = 1)
+                            btn3 = types.InlineKeyboardButton(text="Обратно👈", callback_data=f"Udal")
+                            markup.add(btn3)
+                            bot.send_photo(idtg, file, f'''
+Произошла ошибка!
+                            ''',  reply_markup=markup, parse_mode='HTML')
             def Master(message, x):
                 idtg = str(message.chat.id)
                 db = sqlite3.connect("santa.db")
