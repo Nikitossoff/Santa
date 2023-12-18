@@ -662,7 +662,13 @@ def main():
                                     pass
                             except:
                                 pass 
+                            c.execute("""SELECT name FROM users WHERE idtg = ?""", [idtg])
+                            imya = c.fetchone()[0]
+                            c.execute("""SELECT present FROM users WHERE name = ?""",[x])
+                            gg = c.fetchone()[0]
+                            c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [0, gg])
                             c.execute("""UPDATE users SET present = ? WHERE name = ?""", [message.text, x])
+                            c.execute("""UPDATE users SET gift = ? WHERE name = ?""", [imya, message.text])
                             db.commit()
                             file = open("img.jpg", "rb")
                             markup = types.InlineKeyboardMarkup(row_width = 1)

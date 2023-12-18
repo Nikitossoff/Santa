@@ -16,11 +16,20 @@ def main():
     while True:
         if True:
             bot = telebot.TeleBot('6730404345:AAFDzd2dNczarAiz40S7bXlAMF-qX9QSrp4')
-            @bot.message_handler(commands=["start", "room"])
+            @bot.message_handler(commands=["start", "room", "admin"])
             def start(message, res=False):
                 idtg = str(message.from_user.id)
                 db = sqlite3.connect("base.db")
                 c  = db.cursor()
+                if message.text == "/admin":
+                    try:
+                        bot.delete_message(idtg, message.message_id)
+                        try:
+                            bot.delete_message(idtg, int(message.message_id)-1,2)
+                        except:
+                            pass
+                    except:
+                            pass
                 if "/room" in message.text:
                     try:
                         bot.delete_message(idtg, message.message_id)
@@ -48,12 +57,10 @@ def main():
                         c.execute(f"INSERT INTO users VALUES (?,?,?)",(idtg, message.from_user.username, "Не установлено👽"))
                         db.commit()
                         bot.send_sticker(idtg, 'CAACAgIAAxkBAAJlBWVvZFJawM0Ql_mcD7790kwJ4yAUAAICEwACKZNgSSrrCEqnzUAfMwQ')
-                        bot.send_photo(idtg, file, f'''
-Привет!❄️
+                        bot.send_photo(idtg, file, f'''Привет, <u><b>{message.from_user.first_name}</b></u>!❄️
 Добро пожаловать в игру <u>"Тайный санта"</u>!🎅 
 Я бот, который поможет тебе организовать небольшой праздник в предверии Нового Года!🥳 
-Ну что давай расскажу как играть в Тайного Санту...🎁
-                        ''', parse_mode='HTML')
+Ну что давай расскажу как играть в Тайного Санту...🎁''',reply_markup=markup,parse_mode='HTML')
                         time.sleep(1)
                         markup = types.InlineKeyboardMarkup(row_width = 1)
                         btn1 = types.InlineKeyboardButton(text="В меню👌", callback_data=f"menu")
