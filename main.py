@@ -17,7 +17,7 @@ import numpy as np
 def main():
     while True:
         if True:
-            bot = telebot.TeleBot('6730404345:AAFDzd2dNczarAiz40S7bXlAMF-qX9QSrp4')
+            bot = telebot.TeleBot('ТОКЕН')
             @bot.message_handler(commands=["start", "admin"])
             def start(message, res=False):
                 idtg = str(message.from_user.id)
